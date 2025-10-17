@@ -121,6 +121,34 @@ void Editor::deleteForward() {
     }
 }
 
+void Editor::deleteCurrentLine() {
+    std::string content = document.getFullText();
+    size_t cursorPos = selection.getCursorPosition();
+    
+    // début de ligne -> dernier '\n'
+    size_t lineStart = cursorPos;
+    while (lineStart > 0 && content[lineStart - 1] != '\n') {
+        lineStart--;
+    }
+    
+    // fin de ligne -> '\n' suivant
+    size_t lineEnd = cursorPos;
+    while (lineEnd < content.length() && content[lineEnd] != '\n') {
+        lineEnd++;
+    }
+
+    if (lineEnd < content.length() && content[lineEnd] == '\n') {
+        lineEnd++;
+    }
+    
+    // supprime la ligne
+    if (lineEnd > lineStart) {
+        document.remove(lineStart, lineEnd - lineStart);
+        selection.setStart(lineStart);
+        selection.setEnd(lineStart);
+        selectingMode = false;
+    }
+}
 
 void Editor::paste() {
     const std::string& clipboardContent = Clipboard::getInstance().getContent();

@@ -22,6 +22,7 @@ public:
     void deleteSelection();
     void deleteBackward();
     void deleteForward();
+    void deleteCurrentLine();
 
     void moveCursor(int offset);
     void extendSelection(int offset);

@@ -151,8 +151,9 @@ void NcursesView::handleInput() {
             editor.insertText("\n");
             break;
 
-        // CTRL+K - supprime la ligne actuel
+        // CTRL+K - supprime la ligne actuelle
         case 11:
+            editor.deleteCurrentLine();
             break;
 
         // Backspace - supprime le caractère avant le curseur
