@@ -1,0 +1,146 @@
+#include "Editor.hpp"
+#include "Clipboard.hpp"
+#include <algorithm>
+
+Editor::Editor(const std::string& initialContent)
+    : document(initialContent), selectingMode(false) {}
+
+void Editor::insertText(const std::string& text) {
+    // Si du texte est sélectionné, on le supprime d'abord
+    if (selection.getStart() != selection.getEnd()) {
+        deleteSelection();
+    }
+
+    size_t pos = selection.getStart();
+    document.insert(text, pos);
+
+    size_t newPos = pos + text.length();
+    selection.setStart(newPos);
+    selection.setEnd(newPos);
+
+    selectingMode = false;
+}
+
+void Editor::moveCursor(int offset) {
+    selectingMode = false;
+
+    int currentPos = static_cast<int>(selection.getCursorPosition());
+    int newPos = currentPos + offset;
+    
+    newPos = std::max(0, newPos);
+    newPos = std::min(newPos, static_cast<int>(document.getLength()));
+
+    selection.setStart(static_cast<size_t>(newPos));
+    selection.setEnd(static_cast<size_t>(newPos));
+}
+
+void Editor::extendSelection(int offset) {
+
+    int currentEnd = static_cast<int>(selection.getCursorPosition());
+    int newEnd = currentEnd + offset;
+    
+    newEnd = std::max(0, newEnd);
+    newEnd = std::min(newEnd, static_cast<int>(document.getLength()));
+    
+    selection.setEnd(static_cast<size_t>(newEnd));
+}
+
+void Editor::toggleSelectionMode() {
+    selectingMode = !selectingMode;
+}
+
+void Editor::toggleNormalMode() {
+    selectingMode = false;
+}
+
+bool Editor::isSelecting() const {
+    return selectingMode;
+}
+
+void Editor::copy() {
+    size_t start = selection.getStart();
+    size_t end = selection.getEnd();
+    if (start != end) {
+        std::string selectedText = document.getText(start, end - start);
+        Clipboard::getInstance().setContent(selectedText);
+    }
+}
+
+void Editor::cut() {
+    copy();
+    deleteSelection();
+}
+
+void Editor::selectAll() {
+    selectingMode = true;
+
+    selection.setStart(0);
+    selection.setEnd(document.getLength());
+}
+
+void Editor::deleteSelection() {
+     size_t start = selection.getStart();
+     size_t end = selection.getEnd();
+     if (start != end) {
+         document.remove(start, end - start);
+         selection.setEnd(start);
+         selection.setStart(start);
+     }
+}
+
+void Editor::deleteBackward() {
+    size_t start = selection.getStart();
+    size_t end = selection.getEnd();
+    
+    // supprime selection si elle existe
+    if (start != end) {
+        deleteSelection();
+        selectingMode = false;
+    }
+
+    else if (start > 0) {
+        document.remove(start - 1, 1);
+        selection.setStart(start - 1);
+        selection.setEnd(start - 1);
+        selectingMode = false;
+    }
+}
+
+void Editor::deleteForward() {
+    size_t start = selection.getStart();
+    size_t end = selection.getEnd();
+    
+    // supprime selection si elle existe
+    if (start != end) {
+        deleteSelection();
+        selectingMode = false;
+    }
+    else if (start < document.getLength()) {
+        document.remove(start, 1);
+        selectingMode = false;
+    }
+}
+
+
+void Editor::paste() {
+    const std::string& clipboardContent = Clipboard::getInstance().getContent();
+    if (!clipboardContent.empty()) {
+        insertText(clipboardContent);
+    }
+}
+
+std::string Editor::getBufferContent() const {
+    return document.getFullText();
+}
+
+size_t Editor::getSelectionStart() const {
+    return selection.getStart();
+}
+
+size_t Editor::getSelectionEnd() const {
+    return selection.getEnd();
+}
+
+size_t Editor::getCursorPosition() const {
+    return selection.getCursorPosition();
+}
