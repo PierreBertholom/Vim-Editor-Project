@@ -12,6 +12,7 @@ private:
     bool selectingMode;
     std::string filename;
     bool modified;
+    size_t targetColumn;
 
 public:
     Editor(const std::string& initialContent = "");
@@ -34,7 +35,9 @@ public:
     void deleteCurrentLine();
 
     void moveCursor(int offset);
+    void moveCursorVertical(int lineOffset);
     void extendSelection(int offset);
+    void extendSelectionVertical(int lineOffset);
 
     void toggleSelectionMode();
     void toggleNormalMode();

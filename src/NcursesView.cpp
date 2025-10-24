@@ -112,9 +112,20 @@ void NcursesView::handleInput() {
         break;
 
         case KEY_UP:
-            break;
+            if (editor.isSelecting()) {
+                editor.extendSelectionVertical(-1);
+            } else {
+                editor.moveCursorVertical(-1);
+            }
+        break;
+        
         case KEY_DOWN:
-            break;
+            if (editor.isSelecting()) {
+                editor.extendSelectionVertical(1);
+            } else {
+                editor.moveCursorVertical(1);
+            }
+        break;
 
         // CTRL+S - Mode sélection
         case 19:
