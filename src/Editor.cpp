@@ -1,9 +1,12 @@
 #include "Editor.hpp"
 #include "Clipboard.hpp"
 #include <algorithm>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 Editor::Editor(const std::string& initialContent)
-    : document(initialContent), selectingMode(false) {}
+    : document(initialContent), selectingMode(false), filename(""), modified(false) {}
 
 void Editor::insertText(const std::string& text) {
     // Si du texte est sélectionné, on le supprime d'abord
@@ -19,6 +22,7 @@ void Editor::insertText(const std::string& text) {
     selection.setEnd(newPos);
 
     selectingMode = false;
+    modified = true;
 }
 
 void Editor::moveCursor(int offset) {
@@ -85,6 +89,7 @@ void Editor::deleteSelection() {
          document.remove(start, end - start);
          selection.setEnd(start);
          selection.setStart(start);
+         modified = true;
      }
 }
 
@@ -171,4 +176,60 @@ size_t Editor::getSelectionEnd() const {
 
 size_t Editor::getCursorPosition() const {
     return selection.getCursorPosition();
+}
+
+bool Editor::hasBeenModified() const {
+    return modified;
+}
+
+bool Editor::loadFile(const std::string& filepath) {
+    std::ifstream file(filepath);
+    if (!file.is_open()) {
+        return false;
+    }
+    
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string content = buffer.str();
+    file.close();
+    
+    document = PieceTable(content);
+    
+    selection.setStart(0);
+    selection.setEnd(0);
+    selectingMode = false;
+    
+    filename = filepath;
+    modified = false;
+    
+    return true;
+}
+
+bool Editor::saveFile() {
+    if (filename.empty()) {
+        return false;
+    }
+    return saveFileAs(filename);
+}
+
+bool Editor::saveFileAs(const std::string& filepath) {
+    std::ofstream file(filepath);
+    if (!file.is_open()) {
+        return false;
+    }
+    
+    file << document.getFullText();
+    file.close();
+    
+    filename = filepath;
+    modified = false;
+    return true;
+}
+
+std::string Editor::getFilename() const {
+    return filename;
+}
+
+bool Editor::hasFilename() const {
+    return !filename.empty();
 }

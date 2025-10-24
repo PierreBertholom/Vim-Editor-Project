@@ -9,6 +9,26 @@ PieceTable::PieceTable(const std::string& initialContent) : textLength(initialCo
     }
 }
 
+PieceTable& PieceTable::operator=(const PieceTable& other) {
+    if (this != &other) {
+        originalBuffer = other.originalBuffer;
+        addBuffer = other.addBuffer;
+        textLength = other.textLength;
+        
+        pieces.clear();
+        for (const auto& piece : other.pieces) {
+            Buffer* DestSource;
+            if (piece.source == &other.originalBuffer) {
+                DestSource = &originalBuffer;
+            } else {
+                DestSource = &addBuffer;
+            }
+            pieces.emplace_back(DestSource, piece.start, piece.length);
+        }
+    }
+    return *this;
+}
+
 size_t PieceTable::getLength() const {
     return textLength;
 }

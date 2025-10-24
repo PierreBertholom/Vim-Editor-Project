@@ -14,7 +14,8 @@ private:
     size_t textLength;
 
 public:
-    PieceTable(const std::string& initialContent);
+    PieceTable(const std::string& initialContent = "");
+    PieceTable& operator=(const PieceTable& other);
 
     void insert(const std::string& text, size_t position);
     void remove(size_t position, size_t count);

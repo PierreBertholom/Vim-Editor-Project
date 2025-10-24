@@ -10,9 +10,18 @@ private:
     PieceTable document;
     Selection selection;
     bool selectingMode;
+    std::string filename;
+    bool modified;
 
 public:
-    Editor(const std::string& initialContent = "Hello, world!\n");
+    Editor(const std::string& initialContent = "");
+    
+    bool loadFile(const std::string& filepath);
+    bool saveFile();
+    bool saveFileAs(const std::string& filepath);
+    std::string getFilename() const;
+    bool hasFilename() const;
+    bool hasBeenModified() const;
 
     void copy();
     void cut();

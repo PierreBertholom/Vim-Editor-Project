@@ -71,8 +71,15 @@ void NcursesView::display() {
     getmaxyx(stdscr, rows, cols);
     attron(A_REVERSE);
     
+    // Affiche le mode et le nom du fichier
     std::string status = (editor.isSelecting()) ? "-- SELECTING --" : "-- NORMAL --";
+    std::string filename = editor.hasFilename() 
+        ? (editor.hasBeenModified() ? "*" + editor.getFilename() : editor.getFilename())
+        : "[Nouveau fichier]";
+    
+    // Affiche le statut à gauche et le nom du fichier à droite
     mvprintw(rows - 1, 0, "%s", status.c_str());
+    mvprintw(rows - 1, cols - filename.length() - 1, "%s", filename.c_str());
     attroff(A_REVERSE);
     
     if (hasSelection) {
@@ -109,7 +116,7 @@ void NcursesView::handleInput() {
         case KEY_DOWN:
             break;
 
-        // Mode sélection
+        // CTRL+S - Mode sélection
         case 19:
             editor.toggleSelectionMode();
             break;
@@ -122,6 +129,11 @@ void NcursesView::handleInput() {
         // CTRL+Q - quitter
         case 17:
             isRunning = false;
+            break;
+        
+        // CTRL+W - write, sauvegarde
+        case 23:
+            editor.saveFile();
             break;
         
         // CTRL+C - copier
