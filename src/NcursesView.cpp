@@ -1,6 +1,7 @@
 #include "NcursesView.hpp"
 #include "Editor.hpp"
 #include <ncurses.h>
+#include <iostream>
 
 NcursesView::NcursesView(Editor& editor) : editor(editor), isRunning(true) {
     initialize();
@@ -94,8 +95,8 @@ void NcursesView::display() {
 
 void NcursesView::handleInput() {
     int ch = getch();
-
-    switch (ch) {
+    
+    switch(ch) {
         case KEY_LEFT:
             if (editor.isSelecting()) {
                 editor.extendSelection(-1);
@@ -189,6 +190,16 @@ void NcursesView::handleInput() {
         // Del - supprime le caractère après le curseur
         case KEY_DC:
             editor.deleteForward();
+            break;
+
+        // CTRL+Z - défait une action
+        case 26:
+            editor.undo();
+            break;
+        
+        // CTRL+Y - refait une action
+        case 25:
+            editor.redo();
             break;
 
         default:

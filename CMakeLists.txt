@@ -15,6 +15,9 @@ add_executable(mini_editeur_tp2_omd
         include/Selection.hpp
         include/Piece.hpp
         include/PieceTable.hpp
+        include/Command.hpp
+        include/CommandManager.hpp
+        include/TextCommands.hpp
         src/Buffer.cpp
         src/Clipboard.cpp
         src/Editor.cpp
@@ -22,6 +25,8 @@ add_executable(mini_editeur_tp2_omd
         src/NcursesView.cpp
         src/Selection.cpp
         src/PieceTable.cpp
+        src/CommandManager.cpp
+        src/TextCommands.cpp
 )
 
 target_link_libraries(mini_editeur_tp2_omd ncurses)

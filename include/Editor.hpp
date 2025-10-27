@@ -3,6 +3,7 @@
 
 #include "PieceTable.hpp"
 #include "Selection.hpp"
+#include "CommandManager.hpp"
 #include <string>
 
 class Editor {
@@ -13,6 +14,7 @@ private:
     std::string filename;
     bool modified;
     size_t targetColumn;
+    CommandManager commandManager;
 
 public:
     Editor(const std::string& initialContent = "");
@@ -47,6 +49,11 @@ public:
     size_t getSelectionStart() const;
     size_t getSelectionEnd() const;
     size_t getCursorPosition() const;
+
+    void undo();
+    void redo();
+    bool canUndo() const;
+    bool canRedo() const;
 };
 
 #endif // EDITOR_HPP

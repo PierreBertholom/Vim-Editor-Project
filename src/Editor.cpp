@@ -1,5 +1,6 @@
 #include "Editor.hpp"
 #include "Clipboard.hpp"
+#include "TextCommands.hpp"
 #include <algorithm>
 #include <fstream>
 #include <sstream>
@@ -11,15 +12,15 @@ Editor::Editor(const std::string& initialContent)
 void Editor::insertText(const std::string& text) {
     // Si du texte est sélectionné, on le supprime d'abord
     if (selection.getStart() != selection.getEnd()) {
-        deleteSelection();
+        size_t start = selection.getStart();
+        size_t end = selection.getEnd();
+        auto deleteCmd = std::make_unique<DeleteCommand>(document, selection, start, end - start);
+        commandManager.executeCommand(std::move(deleteCmd));
     }
 
     size_t pos = selection.getStart();
-    document.insert(text, pos);
-
-    size_t newPos = pos + text.length();
-    selection.setStart(newPos);
-    selection.setEnd(newPos);
+    auto insertCmd = std::make_unique<InsertCommand>(document, selection, pos, text);
+    commandManager.executeCommand(std::move(insertCmd));
 
     selectingMode = false;
     modified = true;
@@ -188,10 +189,9 @@ void Editor::deleteSelection() {
      size_t start = selection.getStart();
      size_t end = selection.getEnd();
      if (start != end) {
-         document.remove(start, end - start);
-         selection.setEnd(start);
-         selection.setStart(start);
-         modified = true;
+        auto cmd = std::make_unique<DeleteCommand>(document, selection, start, end - start);
+        commandManager.executeCommand(std::move(cmd));
+        modified = true;
      }
 }
 
@@ -204,12 +204,11 @@ void Editor::deleteBackward() {
         deleteSelection();
         selectingMode = false;
     }
-
     else if (start > 0) {
-        document.remove(start - 1, 1);
-        selection.setStart(start - 1);
-        selection.setEnd(start - 1);
+        auto cmd = std::make_unique<DeleteCommand>(document, selection, start - 1, 1);
+        commandManager.executeCommand(std::move(cmd));
         selectingMode = false;
+        modified = true;
     }
 }
 
@@ -223,8 +222,10 @@ void Editor::deleteForward() {
         selectingMode = false;
     }
     else if (start < document.getLength()) {
-        document.remove(start, 1);
+        auto cmd = std::make_unique<DeleteCommand>(document, selection, start, 1);
+        commandManager.executeCommand(std::move(cmd));
         selectingMode = false;
+        modified = true;
     }
 }
 
@@ -250,10 +251,10 @@ void Editor::deleteCurrentLine() {
     
     // supprime la ligne
     if (lineEnd > lineStart) {
-        document.remove(lineStart, lineEnd - lineStart);
-        selection.setStart(lineStart);
-        selection.setEnd(lineStart);
+        auto cmd = std::make_unique<DeleteCommand>(document, selection, lineStart, lineEnd - lineStart);
+        commandManager.executeCommand(std::move(cmd));
         selectingMode = false;
+        modified = true;
     }
 }
 
@@ -334,4 +335,20 @@ std::string Editor::getFilename() const {
 
 bool Editor::hasFilename() const {
     return !filename.empty();
+}
+
+void Editor::undo() {
+    commandManager.undo();
+}
+
+void Editor::redo() {
+    commandManager.redo();
+}
+
+bool Editor::canUndo() const {
+    return commandManager.canUndo();
+}
+
+bool Editor::canRedo() const {
+    return commandManager.canRedo();
 }
