@@ -38,4 +38,13 @@ bool CommandManager::canRedo() const {
 void CommandManager::clear() {
     while (!undoStack.empty()) undoStack.pop();
     while (!redoStack.empty()) redoStack.pop();
+    saveState = 0;
+}
+
+void CommandManager::markAsSaved() {
+    saveState = undoStack.size();
+}
+
+bool CommandManager::isModified() const {
+    return undoStack.size() != saveState;
 }

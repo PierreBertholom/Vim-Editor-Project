@@ -7,7 +7,7 @@
 #include <iostream>
 
 Editor::Editor(const std::string& initialContent)
-    : document(initialContent), selectingMode(false), filename(""), modified(false), targetColumn(0) {}
+    : document(initialContent), selectingMode(false), filename(""), targetColumn(0) {}
 
 void Editor::insertText(const std::string& text) {
     // Si du texte est sélectionné, on le supprime d'abord
@@ -23,7 +23,6 @@ void Editor::insertText(const std::string& text) {
     commandManager.executeCommand(std::move(insertCmd));
 
     selectingMode = false;
-    modified = true;
 }
 
 void Editor::moveCursor(int offset) {
@@ -191,7 +190,6 @@ void Editor::deleteSelection() {
      if (start != end) {
         auto cmd = std::make_unique<DeleteCommand>(document, selection, start, end - start);
         commandManager.executeCommand(std::move(cmd));
-        modified = true;
      }
 }
 
@@ -208,7 +206,6 @@ void Editor::deleteBackward() {
         auto cmd = std::make_unique<DeleteCommand>(document, selection, start - 1, 1);
         commandManager.executeCommand(std::move(cmd));
         selectingMode = false;
-        modified = true;
     }
 }
 
@@ -225,7 +222,6 @@ void Editor::deleteForward() {
         auto cmd = std::make_unique<DeleteCommand>(document, selection, start, 1);
         commandManager.executeCommand(std::move(cmd));
         selectingMode = false;
-        modified = true;
     }
 }
 
@@ -254,7 +250,6 @@ void Editor::deleteCurrentLine() {
         auto cmd = std::make_unique<DeleteCommand>(document, selection, lineStart, lineEnd - lineStart);
         commandManager.executeCommand(std::move(cmd));
         selectingMode = false;
-        modified = true;
     }
 }
 
@@ -282,7 +277,7 @@ size_t Editor::getCursorPosition() const {
 }
 
 bool Editor::hasBeenModified() const {
-    return modified;
+    return commandManager.isModified();
 }
 
 bool Editor::loadFile(const std::string& filepath) {
@@ -303,7 +298,8 @@ bool Editor::loadFile(const std::string& filepath) {
     selectingMode = false;
     
     filename = filepath;
-    modified = false;
+    commandManager.clear();
+    commandManager.markAsSaved();
     
     return true;
 }
@@ -325,7 +321,8 @@ bool Editor::saveFileAs(const std::string& filepath) {
     file.close();
     
     filename = filepath;
-    modified = false;
+    commandManager.clear();
+    commandManager.markAsSaved();
     return true;
 }
 

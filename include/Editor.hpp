@@ -12,7 +12,6 @@ private:
     Selection selection;
     bool selectingMode;
     std::string filename;
-    bool modified;
     size_t targetColumn;
     CommandManager commandManager;
 
