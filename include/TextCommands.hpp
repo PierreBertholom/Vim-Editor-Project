@@ -20,6 +20,7 @@ public:
     InsertCommand(PieceTable& doc, Selection& sel, size_t pos, const std::string& text);
     void execute() override;
     void undo() override;
+    std::unique_ptr<Command> clone() const override;
 };
 
 // Commande pour supprimer du texte
@@ -37,6 +38,7 @@ public:
     DeleteCommand(PieceTable& doc, Selection& sel, size_t pos, size_t len);
     void execute() override;
     void undo() override;
+    std::unique_ptr<Command> clone() const override;
 };
 
 #endif // TEXTCOMMANDS_HPP

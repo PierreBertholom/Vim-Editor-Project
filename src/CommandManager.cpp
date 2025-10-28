@@ -48,3 +48,34 @@ void CommandManager::markAsSaved() {
 bool CommandManager::isModified() const {
     return undoStack.size() != saveState;
 }
+
+void CommandManager::startRecording() {
+    macroActions.clear();
+    isRecording = true;
+}
+
+void CommandManager::stopRecording() {
+    isRecording = false;
+}
+
+void CommandManager::playMacro() {
+    if (macroActions.empty() || isRecording) return;
+    
+    for (const auto& action : macroActions) {
+        action();
+    }
+}
+
+bool CommandManager::recording() const {
+    return isRecording;
+}
+
+bool CommandManager::hasMacro() const {
+    return !macroActions.empty();
+}
+
+void CommandManager::recordAction(std::function<void()> action) {
+    if (isRecording) {
+        macroActions.push_back(action);
+    }
+}

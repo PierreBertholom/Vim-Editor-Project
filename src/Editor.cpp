@@ -349,3 +349,27 @@ bool Editor::canUndo() const {
 bool Editor::canRedo() const {
     return commandManager.canRedo();
 }
+
+void Editor::startRecordingMacro() {
+    commandManager.startRecording();
+}
+
+void Editor::stopRecordingMacro() {
+    commandManager.stopRecording();
+}
+
+void Editor::playMacro() {
+    commandManager.playMacro();
+}
+
+bool Editor::isRecordingMacro() const {
+    return commandManager.recording();
+}
+
+bool Editor::hasMacro() const {
+    return commandManager.hasMacro();
+}
+
+void Editor::recordMacroAction(std::function<void()> action) {
+    commandManager.recordAction(action);
+}

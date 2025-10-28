@@ -81,6 +81,14 @@ void NcursesView::display() {
     // Affiche le statut à gauche et le nom du fichier à droite
     mvprintw(rows - 1, 0, "%s", status.c_str());
     mvprintw(rows - 1, cols - filename.length() - 1, "%s", filename.c_str());
+    
+    // Afficher le statut de la macro au centre
+    if (editor.isRecordingMacro()) {
+        mvprintw(rows - 1, (cols - 5) / 2, " REC ");
+    } else if (editor.hasMacro()) {
+        mvprintw(rows - 1, (cols - 14) / 2, "[Macro saved]");
+    }
+    
     attroff(A_REVERSE);
     
     if (hasSelection) {
@@ -99,31 +107,39 @@ void NcursesView::handleInput() {
     switch(ch) {
         case KEY_LEFT:
             if (editor.isSelecting()) {
+                editor.recordMacroAction([this]() { editor.extendSelection(-1); });
                 editor.extendSelection(-1);
             } else {
+                editor.recordMacroAction([this]() { editor.moveCursor(-1); });
                 editor.moveCursor(-1);
             }
         break;
         case KEY_RIGHT:
             if (editor.isSelecting()) {
+                editor.recordMacroAction([this]() { editor.extendSelection(1); });
                 editor.extendSelection(1);
             } else {
+                editor.recordMacroAction([this]() { editor.moveCursor(1); });
                 editor.moveCursor(1);
             }
         break;
 
         case KEY_UP:
             if (editor.isSelecting()) {
+                editor.recordMacroAction([this]() { editor.extendSelectionVertical(-1); });
                 editor.extendSelectionVertical(-1);
             } else {
+                editor.recordMacroAction([this]() { editor.moveCursorVertical(-1); });
                 editor.moveCursorVertical(-1);
             }
         break;
         
         case KEY_DOWN:
             if (editor.isSelecting()) {
+                editor.recordMacroAction([this]() { editor.extendSelectionVertical(1); });
                 editor.extendSelectionVertical(1);
             } else {
+                editor.recordMacroAction([this]() { editor.moveCursorVertical(1); });
                 editor.moveCursorVertical(1);
             }
         break;
@@ -202,10 +218,26 @@ void NcursesView::handleInput() {
             editor.redo();
             break;
 
+        // CTRL+R - enregistrement de macro
+        case 18:
+            if (editor.isRecordingMacro()) {
+                editor.stopRecordingMacro();
+            } else {
+                editor.startRecordingMacro();
+            }
+            break;
+            
+        // CTRL+P - joue la macro
+        case 16:
+            editor.playMacro();
+            break;
+
         default:
             // Si ce n'est pas une commande, c'est du texte à insérer
             if (ch >= 32 && ch <= 126) {
-                editor.insertText(std::string(1, ch));
+                char c = static_cast<char>(ch);
+                editor.recordMacroAction([this, c]() { editor.insertText(std::string(1, c)); });
+                editor.insertText(std::string(1, c));
             }
             break;
     }

@@ -5,6 +5,7 @@
 #include "Selection.hpp"
 #include "CommandManager.hpp"
 #include <string>
+#include <functional>
 
 class Editor {
 private:
@@ -53,6 +54,15 @@ public:
     void redo();
     bool canUndo() const;
     bool canRedo() const;
+
+    // Macro
+    void startRecordingMacro();
+    void stopRecordingMacro();
+    void playMacro();
+    bool isRecordingMacro() const;
+    bool hasMacro() const;
+    void recordMacroAction(std::function<void()> action);
+
 };
 
 #endif // EDITOR_HPP
