@@ -101,6 +101,25 @@ void NcursesView::display() {
     refresh();
 }
 
+std::string NcursesView::askFilename() {
+  int rows, cols;
+  getmaxyx(stdscr, rows, cols);
+
+  attron(A_REVERSE);
+  mvprintw(rows - 1, 0, "Save as: ");
+  clrtoeol();
+  attroff(A_REVERSE);
+
+  echo();
+  curs_set(1);
+
+  char filename[256];
+  move(rows - 1, 9);
+  getnstr(filename, 255);
+  noecho();
+
+  return std::string(filename);
+}
 void NcursesView::handleInput() {
     int ch = getch();
     
@@ -161,7 +180,14 @@ void NcursesView::handleInput() {
         
         // CTRL+W - write, sauvegarde
         case 23:
-            editor.saveFile();
+            if(editor.hasFilename()) {
+              editor.saveFile();
+            } else {
+              std::string filename = askFilename();
+              if(!filename.empty()) {
+                editor.saveFileAs(filename);
+              }
+            }
             break;
         
         // CTRL+C - copier

@@ -1,6 +1,8 @@
 #ifndef NCURSES_VIEW_HPP
 #define NCURSES_VIEW_HPP
 
+#include <string>
+
 // fwd decl
 class Editor;
 
@@ -13,6 +15,7 @@ private:
     void shutdown();   // Restaure le terminal
     void display();    // Affiche le buffer, la sélection...
     void handleInput(); // Gère les entrées clavier
+    std::string askFilename();
 
 public:
     NcursesView(Editor& editor);

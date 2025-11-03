@@ -1,4 +1,5 @@
 #include "PieceTable.hpp"
+#include <algorithm>
 #include <stdexcept>
 
 PieceTable::PieceTable(const std::string& initialContent) : textLength(initialContent.length()) {
