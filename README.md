@@ -43,16 +43,26 @@ Un mini-éditeur de texte en C++ pour le terminal. Ce projet met en œuvre un bu
 
 ## Installation et Lancement
 
+Les deux versions sont à trouver dans les Releases respectivement V1.0.0 et V2.0.0
+
 ### Prérequis
 * Un compilateur C++ (g++)
 * La bibliothèque `ncurses` (`libncurses-dev`)
 * `Cmake/make`
 
 ### Compilation
+
+#### Linux/MacOS
 1. Installer la librairie `ncurses` si besoin :
+
+    Linux
     ```bash
     sudo pacman -S ncurses
     sudo apt install libncurses5-dev libncursesw5-dev
+    ```
+    MacOS
+    ```bash
+    brew install ncurses
     ```
 1.  Clonez le dépôt :
     ```bash
@@ -64,6 +74,36 @@ Un mini-éditeur de texte en C++ pour le terminal. Ce projet met en œuvre un bu
     mkdir build && cd build 
     cmake ..
     make
+    ```
+
+#### Windows (déconseillé mais fonctionnel)
+1. Installer MSYS et ouvrir MSYS MINGW64 (icône bleue)
+
+2. Installer ncurses et toolchain MinGW
+    ```bash
+    pacman -S --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-ncurses
+    ```
+3. Clonez le dépôt :
+    ```bash
+    git clone git@gitlab2.istic.univ-rennes1.fr:pbertholom/mini-editeur-tp2-omd.git
+    cd mini-editeur-tp2-omd/
+    ```
+3. Modifier le CMakeLists.txt
+    ```cmake
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(NCURSES REQUIRED ncursesw)
+    include_directories(include)
+    include_directories(${NCURSES_INCLUDE_DIRS})
+
+    add_executable(...)
+
+    target_link_libraries(mini_editeur_tp2_omd PRIVATE ${NCURSES_LIBRARIES})
+    ```
+3. Compilez le projet
+    ```bash
+    mkdir build && cd build
+    cmake ..
+    ninja
     ```
 
 ### Lancement
