@@ -1,94 +1,96 @@
-# Mini-Éditeur (TP2-OMD)
+# Mini Text Editor
 
-Un mini-éditeur de texte en C++ pour le terminal. Ce projet met en œuvre un buffer de texte performant (basé sur une **Piece Table**) et une gestion de l'historique et des macros via un **Command Pattern**.
+A lightweight terminal-based text editor written in modern C++.  
+The project implements an efficient text buffer using a **Piece Table** and supports undo/redo and macro recording through a **Command Pattern** architecture.
 
-## Démo Vidéo
+## Demo Video
 
 <video src="demo/video_demo.mp4" controls width="640">
-  Votre navigateur ne supporte pas la lecture vidéo.
+  Your browser does not support video playback.
 </video>
 
+---
 
-## Fonctionnalités
+## Features
 
-### V1
-* **Gestion de fichiers** : Ouverture d'un fichier existant ou création d'un nouveau fichier.
-* **Sauvegarde** : Enregistrement des modifications (`CTRL+W`).
-* **Édition de texte** : Insertion de caractères et de sauts de ligne.
-* **Navigation** : Déplacement du curseur au caractère (`←`/`→`) et à la ligne (`↑`/`↓`).
-* **Suppression** : Suppression avant (`Delete`) et arrière (`Backspace`), et suppression de ligne (`CTRL+K`).
-* **Sélection** : Un "Mode Sélection" (`CTRL+S`) pour surligner du texte.
-* **Presse-papiers** : Copier (`CTRL+C`), Couper (`CTRL+X`), et Coller (`CTRL+V`).
-* **Utilitaire** : Sélectionner tout (`CTRL+A`).
+### Version 1
+* **File Management**: Open an existing file or create a new one.
+* **Saving**: Persist changes (`CTRL+W`).
+* **Text Editing**: Insert characters and line breaks.
+* **Navigation**: Move the cursor horizontally (`←`/`→`) and vertically (`↑`/`↓`).
+* **Deletion**: Forward delete (`Delete`), backward delete (`Backspace`), and delete line (`CTRL+K`).
+* **Selection Mode**: Highlight text with `CTRL+S`.
+* **Clipboard**: Copy (`CTRL+C`), Cut (`CTRL+X`), Paste (`CTRL+V`).
+* **Utilities**: Select all (`CTRL+A`).
 
-### V2
-* **Historique** : Annuler (`CTRL+Z`) et Refaire (`CTRL+Y`) des actions.
-* **Macros** : Enregistrer (`CTRL+R`) et Rejouer (`CTRL+P`) une séquence d'actions.
-* **État** : Un indicateur `*` s'affiche lorsque le fichier a des modifications non sauvegardées.
+### Version 2
+* **History**: Undo (`CTRL+Z`) and Redo (`CTRL+Y`).
+* **Macros**: Record (`CTRL+R`) and replay (`CTRL+P`) sequences of actions.
+* **File Status Indicator**: A `*` marks unsaved changes.
 
 ---
 
-## Conception
+## Architecture & Design
 
-* **Langage** : C++
-* **Interface Terminal** : `ncurses`
-* **Compilation** : `Cmake`
-* **Structure de Données** : `PieceTable` (pour une édition performante sans copie de buffer)
-* **Patrons de Conception** :
-    * **Commande** : Pour encapsuler les actions (Insert, Delete) afin de gérer l'historique (Undo/Redo) et les macros.
-    * **Singleton** : Pour la classe `Clipboard` (Presse-papiers).
-    * **Modèle-Vue-Contrôleur** : Séparation claire entre la logique (`Editor`), les données (`PieceTable`) et l'affichage (`NcursesView`).
+* **Language**: C++
+* **Terminal UI**: `ncurses`
+* **Build System**: `CMake`
+* **Core Data Structure**: Piece Table for fast, non-destructive text editing
+* **Design Patterns**:
+  * **Command Pattern** – Used for encapsulating editing actions to support undo/redo and macro replay.
+  * **Singleton** – Used for the text clipboard.
+  * **Model–View–Controller** – Separation of concerns between logic (`Editor`), data (`PieceTable`), and rendering (`NcursesView`).
 
 ---
 
-## Installation et Lancement
+## Installation & Build
 
-Les deux versions sont à trouver dans les Releases respectivement V1.0.0 et V2.0.0
+### Requirements
+* A C++ compiler (g++)
+* `ncurses` (`libncurses-dev`)
+* `CMake` and `make`
 
-### Prérequis
-* Un compilateur C++ (g++)
-* La bibliothèque `ncurses` (`libncurses-dev`)
-* `Cmake/make`
+### Linux / macOS
 
-### Compilation
+1. Install ncurses:
 
-#### Linux/MacOS
-1. Installer la librairie `ncurses` si besoin :
-
-    Linux
+    **Linux**
     ```bash
     sudo pacman -S ncurses
     sudo apt install libncurses5-dev libncursesw5-dev
     ```
-    MacOS
+
+    **macOS**
     ```bash
     brew install ncurses
     ```
-1.  Clonez le dépôt :
+
+2. Clone the repository:
     ```bash
     git clone git@gitlab2.istic.univ-rennes1.fr:pbertholom/mini-editeur-tp2-omd.git
     cd mini-editeur-tp2-omd/
     ```
-2.  Compilez le projet :
+
+3. Build:
     ```bash
-    mkdir build && cd build 
+    mkdir build && cd build
     cmake ..
     make
     ```
 
-#### Windows (déconseillé mais fonctionnel)
-1. Installer MSYS et ouvrir MSYS MINGW64 (icône bleue)
+### Windows (supported but not recommended)
 
-2. Installer ncurses et toolchain MinGW
+1. Install MSYS and open **MSYS MINGW64**.
+2. Install required packages:
     ```bash
     pacman -S --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-ncurses
     ```
-3. Clonez le dépôt :
+3. Clone the repository:
     ```bash
     git clone git@gitlab2.istic.univ-rennes1.fr:pbertholom/mini-editeur-tp2-omd.git
     cd mini-editeur-tp2-omd/
     ```
-3. Modifier le CMakeLists.txt
+4. Update `CMakeLists.txt`:
     ```cmake
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(NCURSES REQUIRED ncursesw)
@@ -99,63 +101,67 @@ Les deux versions sont à trouver dans les Releases respectivement V1.0.0 et V2.
 
     target_link_libraries(mini_editeur_tp2_omd PRIVATE ${NCURSES_LIBRARIES})
     ```
-3. Compilez le projet
+5. Build:
     ```bash
     mkdir build && cd build
     cmake ..
     ninja
     ```
 
-### Lancement
-* Pour créer un nouveau fichier :
+---
+
+## Running
+
+* Create a new file:
     ```bash
     ./mini_editeur_tp2_omd
     ```
-    ou
+    or
     ```bash
-    ./mini_editeur_tp2_omd nouveau_fichier.txt
+    ./mini_editeur_tp2_omd new_file.txt
     ```
-* Pour ouvrir un fichier existant :
+
+* Open an existing file:
     ```bash
-    ./mini_editeur_tp2_omd fichier_existant.txt
+    ./mini_editeur_tp2_omd existing_file.txt
     ```
 
 ---
 
-## Commandes
+## Controls
 
-L'éditeur possède deux modes : le **Mode Normal** (par défaut, pour l'édition) et le **Mode Sélection** (pour surligner du texte).
+The editor provides two modes: **Normal Mode** (default) and **Selection Mode**.
 
-### Général et Fichier
-| Commande | Action |
+### General & File
+| Command | Action |
 | :--- | :--- |
-| `CTRL+W` | Sauvegarder le fichier |
-| `CTRL+Q` | Quitter l'éditeur |
+| `CTRL+W` | Save file |
+| `CTRL+Q` | Quit editor |
 
-### Navigation et Sélection
-| Commande | Mode Normal | Mode Sélection |
+### Navigation & Selection
+| Command | Normal Mode | Selection Mode |
 | :--- | :--- | :--- |
-| `Flèches` | Déplacer le curseur | Étendre la sélection |
-| `CTRL+S` | Passer en Mode Sélection | - |
-| `Esc` | - | Quitter le Mode Sélection |
-| `CTRL+A` | Sélectionner tout le contenu | - |
+| Arrow Keys | Move cursor | Extend selection |
+| `CTRL+S` | Enter Selection Mode | — |
+| `Esc` | — | Exit Selection Mode |
+| `CTRL+A` | Select all | — |
 
-### Édition et Presse-papiers
-| Commande | Action |
+### Editing & Clipboard
+| Command | Action |
 | :--- | :--- |
-| `Caractères` | Insérer du texte (remplace la sélection si active) |
-| `Entrée` | Insérer une nouvelle ligne |
-| `Backspace` | Supprimer le caractère précédent (ou la sélection) |
-| `Delete` | Supprimer le caractère suivant (ou la sélection) |
-| `CTRL+K` | Supprimer la ligne actuelle |
-| `CTRL+C` | Copier la sélection actuelle |
-| `CTRL+X` | Couper la sélection actuelle |
-| `CTRL+V` | Coller le contenu du presse-papiers |
+| Characters | Insert text |
+| `Enter` | Insert newline |
+| `Backspace` | Delete previous character or selection |
+| `Delete` | Delete next character or selection |
+| `CTRL+K` | Delete current line |
+| `CTRL+C` | Copy selection |
+| `CTRL+X` | Cut selection |
+| `CTRL+V` | Paste clipboard |
 
-### Historique et Macros (V2)
-| Commande | Action |
+### History & Macros (V2)
+| Command | Action |
 | :--- | :--- |
-| `CTRL+Z` | Annuler (Undo) la dernière action |
-| `CTRL+Y` | Refaire (Redo) la dernière action |
-| `CTRL+R` | Démarrer / Arrêter l'enregistrement de la macro |
-| `CTRL+P` | Jouer la macro enregistrée |
+| `CTRL+Z` | Undo |
+| `CTRL+Y` | Redo |
+| `CTRL+R` | Start/Stop macro recording |
+| `CTRL+P` | Play recorded macro |
